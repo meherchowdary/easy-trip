@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -435,4 +436,290 @@ const Home = () => {
               
               <div className="mb-6">
                 <div className="flex justify-between mb-2">
-                  <Label htmlFor="budget-slider">Your Budget: ₹{budget
+                  <Label htmlFor="budget-slider">Your Budget: ₹{budget.toLocaleString()}</Label>
+                  <span className="text-sm text-gray-500">₹5,000 - ₹50,000</span>
+                </div>
+                <Slider
+                  id="budget-slider"
+                  min={5000}
+                  max={50000}
+                  step={1000}
+                  value={[budget]}
+                  onValueChange={(value) => setBudget(value[0])}
+                  className="w-full"
+                />
+              </div>
+              
+              <Button 
+                className="w-full bg-travel-primary hover:bg-travel-primary/90"
+                onClick={handleSearch}
+              >
+                <Search className="mr-2 h-4 w-4" />
+                Search Trips
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Destinations */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Popular Budget-Friendly Destinations</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {destinations.map((destination) => (
+              <Card key={destination.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="relative h-48">
+                  <img 
+                    src={destination.image} 
+                    alt={destination.name} 
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="p-4 pb-0">
+                  <CardTitle className="text-xl">{destination.name}</CardTitle>
+                  <div className="flex items-center text-sm text-gray-500 mt-1">
+                    <Clock className="h-3.5 w-3.5 mr-1" />
+                    <span>{destination.duration}</span>
+                    <span className="mx-2">•</span>
+                    <span>₹{destination.budget.toLocaleString()}</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-2">
+                  <p className="text-sm text-gray-600 mb-2">{destination.description}</p>
+                </CardContent>
+                <CardFooter className="p-4 pt-0 flex justify-between">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleViewItinerary(destination.id)}
+                  >
+                    View Itinerary
+                  </Button>
+                  <div className="flex items-center">
+                    <span className="font-medium mr-1 text-travel-primary">{destination.rating}</span>
+                    <span className="text-yellow-500">★</span>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trip Details Section */}
+      {showTripDetails && selectedDestination && (
+        <section id="trip-details-section" className="py-16 bg-travel-light">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-8">
+              Your Trip to {destinations.find(d => d.id === selectedDestination)?.name}
+            </h2>
+            
+            <div className="max-w-5xl mx-auto">
+              <Tabs value={detailsTab} onValueChange={setDetailsTab} className="w-full">
+                <TabsList className="w-full grid grid-cols-4">
+                  <TabsTrigger value="attractions">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Attractions
+                  </TabsTrigger>
+                  <TabsTrigger value="hotels">
+                    <Hotel className="mr-2 h-4 w-4" />
+                    Hotels
+                  </TabsTrigger>
+                  <TabsTrigger value="transportation">
+                    <Bus className="mr-2 h-4 w-4" />
+                    Transportation
+                  </TabsTrigger>
+                  <TabsTrigger value="itinerary">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Itinerary
+                  </TabsTrigger>
+                </TabsList>
+                
+                <div className="p-4 bg-white rounded-lg mt-4 shadow">
+                  {/* Attractions Tab */}
+                  <TabsContent value="attractions" className="space-y-4">
+                    <h3 className="text-xl font-bold mb-4">Top Attractions in {destinations.find(d => d.id === selectedDestination)?.name}</h3>
+                    
+                    {attractions[selectedDestination as keyof typeof attractions] && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {attractions[selectedDestination as keyof typeof attractions].map((attraction, index) => (
+                          <Card key={index} className="overflow-hidden">
+                            <div className="relative h-48">
+                              <img 
+                                src={attraction.image} 
+                                alt={attraction.name} 
+                                className="absolute inset-0 w-full h-full object-cover"
+                              />
+                            </div>
+                            <CardHeader className="p-4 pb-0">
+                              <CardTitle className="text-lg">{attraction.name}</CardTitle>
+                              <div className="flex items-center text-sm text-gray-500 mt-1">
+                                <span className="font-medium mr-1">{attraction.rating}</span>
+                                <span className="text-yellow-500">★</span>
+                                <span className="mx-2">•</span>
+                                <span>Entry: ₹{attraction.cost.toLocaleString()}</span>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-2">
+                              <p className="text-sm text-gray-600">{attraction.description}</p>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  {/* Hotels Tab */}
+                  <TabsContent value="hotels" className="space-y-4">
+                    <h3 className="text-xl font-bold mb-4">Hotels in {destinations.find(d => d.id === selectedDestination)?.name}</h3>
+                    
+                    {hotels[selectedDestination as keyof typeof hotels] && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {hotels[selectedDestination as keyof typeof hotels].map((hotel, index) => (
+                          <Card key={index} className="overflow-hidden">
+                            <div className="relative h-48">
+                              <img 
+                                src={hotel.image} 
+                                alt={hotel.name} 
+                                className="absolute inset-0 w-full h-full object-cover"
+                              />
+                            </div>
+                            <CardHeader className="p-4 pb-0">
+                              <CardTitle className="text-lg">{hotel.name}</CardTitle>
+                              <div className="flex items-center text-sm text-gray-500 mt-1">
+                                <span className="font-medium mr-1">{hotel.rating}</span>
+                                <span className="text-yellow-500">★</span>
+                                <span className="mx-2">•</span>
+                                <span>Per night: ₹{hotel.cost.toLocaleString()}</span>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-2">
+                              <p className="text-sm text-gray-600">{hotel.description}</p>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  {/* Transportation Tab */}
+                  <TabsContent value="transportation" className="space-y-4">
+                    <h3 className="text-xl font-bold mb-4">Transportation to {destinations.find(d => d.id === selectedDestination)?.name}</h3>
+                    
+                    {transportation[selectedDestination as keyof typeof transportation] && (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Mode</TableHead>
+                            <TableHead>From</TableHead>
+                            <TableHead>Duration</TableHead>
+                            <TableHead>Departure</TableHead>
+                            <TableHead>Arrival</TableHead>
+                            <TableHead>Cost</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {transportation[selectedDestination as keyof typeof transportation].map((transport, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium">
+                                <div className="flex items-center">
+                                  {transport.type === 'bus' && <Bus className="mr-2 h-4 w-4" />}
+                                  {transport.type === 'train' && <Train className="mr-2 h-4 w-4" />}
+                                  {transport.type === 'car' && <Car className="mr-2 h-4 w-4" />}
+                                  {transport.name}
+                                </div>
+                              </TableCell>
+                              <TableCell>{transport.from}</TableCell>
+                              <TableCell>{transport.duration}</TableCell>
+                              <TableCell>{transport.departureTime}</TableCell>
+                              <TableCell>{transport.arrivalTime}</TableCell>
+                              <TableCell>₹{transport.cost.toLocaleString()}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    )}
+                  </TabsContent>
+                  
+                  {/* Itinerary Tab */}
+                  <TabsContent value="itinerary" id="itinerary-section" className="space-y-4">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-xl font-bold">
+                        Daily Itinerary for {destinations.find(d => d.id === selectedDestination)?.name}
+                      </h3>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500">Total duration: {destinations.find(d => d.id === selectedDestination)?.duration}</p>
+                        <p className="font-bold">Total Cost: ₹{calculateTotalCost(selectedDestination).toLocaleString()}</p>
+                      </div>
+                    </div>
+                    
+                    {itineraries[selectedDestination as keyof typeof itineraries] && (
+                      <div className="space-y-6">
+                        {itineraries[selectedDestination as keyof typeof itineraries].map((day) => (
+                          <Card key={day.day} className="overflow-hidden">
+                            <CardHeader className="bg-travel-light p-4">
+                              <CardTitle className="text-lg">Day {day.day}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead className="w-24">Time</TableHead>
+                                    <TableHead>Activity</TableHead>
+                                    <TableHead className="text-right w-24">Cost</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {day.activities.map((activity, index) => (
+                                    <TableRow key={index}>
+                                      <TableCell className="font-medium">{activity.time}</TableCell>
+                                      <TableCell>{activity.activity}</TableCell>
+                                      <TableCell className="text-right">₹{activity.cost.toLocaleString()}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                  <TableRow>
+                                    <TableCell colSpan={2} className="text-right font-bold">
+                                      Day Total:
+                                    </TableCell>
+                                    <TableCell className="text-right font-bold">
+                                      ₹{day.activities.reduce((sum, activity) => sum + activity.cost, 0).toLocaleString()}
+                                    </TableCell>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Call to Action */}
+      <section className="py-16 bg-travel-primary text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Book your budget-friendly trip today and create memories that last a lifetime.
+          </p>
+          <Button 
+            size="lg" 
+            className="bg-white text-travel-primary hover:bg-gray-100"
+            onClick={() => document.getElementById('search-section')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            Plan Your Trip Now
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;
