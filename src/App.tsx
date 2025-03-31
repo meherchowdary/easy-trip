@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Index";
 import Destinations from "./pages/Destinations";
+import DestinationDetails from "./pages/DestinationDetails";
 import PackingAssistant from "./pages/PackingAssistant";
 import ChatGuide from "./pages/ChatGuide";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/destinations" element={<Destinations />} />
+            <Route path="/destinations/:id" element={<DestinationDetails />} />
             <Route path="/packing-assistant" element={<PackingAssistant />} />
             <Route path="/chat" element={<ChatGuide />} />
             <Route path="*" element={<NotFound />} />
