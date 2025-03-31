@@ -2,7 +2,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { MapOff } from "lucide-react";
+import { Map } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -19,7 +19,7 @@ const NotFound = () => {
       <div className="text-center max-w-md">
         <div className="flex justify-center mb-6">
           <div className="bg-travel-primary/10 p-6 rounded-full">
-            <MapOff className="h-16 w-16 text-travel-primary" />
+            <Map className="h-16 w-16 text-travel-primary" />
           </div>
         </div>
         <h1 className="text-4xl font-bold mb-4 text-gray-800">Oops! Lost in Transit</h1>
