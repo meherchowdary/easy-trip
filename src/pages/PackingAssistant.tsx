@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,12 +71,19 @@ const packingItems = {
   ],
 };
 
+// Define a type for the packing item
+interface PackingItem {
+  id: string;
+  name: string;
+  category: string;
+}
+
 const PackingAssistant = () => {
   const { toast } = useToast();
   const [destination, setDestination] = useState('');
   const [duration, setDuration] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [packingList, setPackingList] = useState<any[]>([]);
+  const [packingList, setPackingList] = useState<PackingItem[]>([]);
   const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
   
   const generatePackingList = () => {
@@ -149,13 +155,13 @@ const PackingAssistant = () => {
     return 'bg-green-500';
   };
   
-  const groupedPackingItems = packingList.reduce((acc, item) => {
+  const groupedPackingItems: Record<string, PackingItem[]> = packingList.reduce((acc, item) => {
     if (!acc[item.category]) {
       acc[item.category] = [];
     }
     acc[item.category].push(item);
     return acc;
-  }, {} as Record<string, typeof packingList>);
+  }, {} as Record<string, PackingItem[]>);
 
   return (
     <div className="py-12">
