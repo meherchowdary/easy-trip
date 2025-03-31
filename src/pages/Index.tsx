@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -8,14 +7,13 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plane, Hotel, MapPin, Calendar, Globe, Search, ArrowRight, Clock, Bus, Train, Car } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 
-// Mock data
 const destinations = [
   {
     id: 1,
@@ -55,7 +53,6 @@ const destinations = [
   }
 ];
 
-// Mock itineraries data
 const itineraries = {
   1: [
     {
@@ -133,8 +130,7 @@ const itineraries = {
         { time: '04:00 PM', activity: 'Water sports activities', cost: 2500 },
         { time: '08:00 PM', activity: 'Dinner and nightlife at Tito\'s Lane', cost: 2000 }
       ]
-    },
-    // More days for Goa...
+    }
   ],
   4: [
     {
@@ -145,12 +141,10 @@ const itineraries = {
         { time: '03:00 PM', activity: 'Cruise through backwaters', cost: 0 },
         { time: '07:00 PM', activity: 'Dinner on houseboat and overnight stay', cost: 1000 }
       ]
-    },
-    // More days for Kerala...
+    }
   ]
 };
 
-// Mock attractions data
 const attractions = {
   1: [
     { name: 'Amber Fort', description: 'Magnificent fort with stunning architecture', cost: 1000, rating: 4.8, image: 'https://images.unsplash.com/photo-1586164383881-d1a398df7c0c?q=80&w=500&auto=format&fit=crop' },
@@ -178,7 +172,6 @@ const attractions = {
   ]
 };
 
-// Mock hotels data
 const hotels = {
   1: [
     { name: 'Hotel Jaipur Palace', description: 'Elegant hotel with rooftop pool', cost: 3500, rating: 4.5, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=500&auto=format&fit=crop' },
@@ -206,7 +199,6 @@ const hotels = {
   ]
 };
 
-// Mock transportation data
 const transportation = {
   1: [
     { type: 'bus', name: 'Volvo AC Sleeper', from: 'Delhi', duration: '6 hours', cost: 800, departureTime: '10:00 PM', arrivalTime: '04:00 AM' },
@@ -245,10 +237,34 @@ const Home = () => {
   const [showItinerary, setShowItinerary] = useState(false);
   const [showTripDetails, setShowTripDetails] = useState(false);
   const [detailsTab, setDetailsTab] = useState("attractions");
+  const [requiredDays, setRequiredDays] = useState<number>(0);
+  const [filteredHotels, setFilteredHotels] = useState<any>({});
+  const [filteredTransportation, setFilteredTransportation] = useState<any>({});
+  const [filteredItineraries, setFilteredItineraries] = useState<any>({});
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const days = differenceInDays(endDate, startDate) + 1;
+      setRequiredDays(days > 0 ? days : 0);
+    } else {
+      setRequiredDays(0);
+    }
+  }, [startDate, endDate]);
 
   const handleSearch = () => {
-    const filtered = destinations.filter(dest => dest.budget <= budget && 
-      (searchQuery === '' || dest.name.toLowerCase().includes(searchQuery.toLowerCase())));
+    const filtered = destinations.filter(dest => {
+      const matchesBudget = dest.budget <= budget;
+      const matchesSearch = searchQuery === '' || 
+        dest.name.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      let matchesDays = true;
+      if (requiredDays > 0) {
+        const destinationDays = parseInt(dest.duration.split(' ')[0], 10);
+        matchesDays = destinationDays <= requiredDays;
+      }
+      
+      return matchesBudget && matchesSearch && matchesDays;
+    });
     
     setFilteredDestinations(filtered);
     setShowTripDetails(filtered.length > 0);
@@ -257,10 +273,40 @@ const Home = () => {
       setSelectedDestination(filtered[0].id);
       setShowItinerary(true);
       
-      // Scroll to trip details section
-      setTimeout(() => {
-        document.getElementById('trip-details-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      const hotelsByBudget: Record<number, any[]> = {};
+      Object.entries(hotels).forEach(([destId, hotelList]) => {
+        const destIdNum = parseInt(destId, 10);
+        if (filtered.some(d => d.id === destIdNum)) {
+          hotelsByBudget[destIdNum] = (hotelList as any[]).filter(
+            hotel => hotel.cost * requiredDays <= budget
+          );
+        }
+      });
+      setFilteredHotels(hotelsByBudget);
+      
+      const transportByBudget: Record<number, any[]> = {};
+      Object.entries(transportation).forEach(([destId, transportList]) => {
+        const destIdNum = parseInt(destId, 10);
+        if (filtered.some(d => d.id === destIdNum)) {
+          transportByBudget[destIdNum] = (transportList as any[]).filter(
+            transport => transport.cost <= budget
+          );
+        }
+      });
+      setFilteredTransportation(transportByBudget);
+      
+      const itinerariesByDays: Record<number, any[]> = {};
+      Object.entries(itineraries).forEach(([destId, daysList]) => {
+        const destIdNum = parseInt(destId, 10);
+        if (filtered.some(d => d.id === destIdNum)) {
+          if (requiredDays > 0) {
+            itinerariesByDays[destIdNum] = (daysList as any[]).slice(0, requiredDays);
+          } else {
+            itinerariesByDays[destIdNum] = daysList;
+          }
+        }
+      });
+      setFilteredItineraries(itinerariesByDays);
       
       toast({
         title: `Found ${filtered.length} destinations`,
@@ -281,26 +327,193 @@ const Home = () => {
     setShowItinerary(true);
     setShowTripDetails(true);
     
-    // Scroll to itinerary section
-    setTimeout(() => {
-      document.getElementById('itinerary-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    if (hotels[destId]) {
+      setFilteredHotels({
+        [destId]: hotels[destId].filter(hotel => hotel.cost * (requiredDays || 1) <= budget)
+      });
+    }
+    
+    if (transportation[destId]) {
+      setFilteredTransportation({
+        [destId]: transportation[destId].filter(transport => transport.cost <= budget)
+      });
+    }
+    
+    if (itineraries[destId]) {
+      if (requiredDays > 0) {
+        setFilteredItineraries({
+          [destId]: itineraries[destId].slice(0, requiredDays)
+        });
+      } else {
+        setFilteredItineraries({
+          [destId]: itineraries[destId]
+        });
+      }
+    }
   };
 
   const calculateTotalCost = (destId: number) => {
-    if (!itineraries[destId as keyof typeof itineraries]) return 0;
+    if (!filteredItineraries[destId]) return 0;
     
-    return itineraries[destId as keyof typeof itineraries].reduce((total, day) => {
-      const dayCost = day.activities.reduce((sum, activity) => sum + activity.cost, 0);
+    return filteredItineraries[destId].reduce((total: number, day: any) => {
+      const dayCost = day.activities.reduce((sum: number, activity: any) => sum + activity.cost, 0);
       return total + dayCost;
     }, 0);
   };
 
-  
+  const renderHotelsTab = () => {
+    return (
+      <TabsContent value="hotels" className="space-y-4">
+        <h3 className="text-xl font-bold mb-4">Hotels in {destinations.find(d => d.id === selectedDestination)?.name}</h3>
+        
+        {selectedDestination && filteredHotels[selectedDestination] && filteredHotels[selectedDestination].length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredHotels[selectedDestination].map((hotel: any, index: number) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="relative h-48">
+                  <img 
+                    src={hotel.image} 
+                    alt={hotel.name} 
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="p-4 pb-0">
+                  <CardTitle className="text-lg">{hotel.name}</CardTitle>
+                  <div className="flex items-center text-sm text-gray-500 mt-1">
+                    <span className="font-medium mr-1">{hotel.rating}</span>
+                    <span className="text-yellow-500">★</span>
+                    <span className="mx-2">•</span>
+                    <span>Per night: ₹{hotel.cost.toLocaleString()}</span>
+                    {requiredDays > 0 && (
+                      <span className="ml-2">• Total: ₹{(hotel.cost * requiredDays).toLocaleString()}</span>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-2">
+                  <p className="text-sm text-gray-600">{hotel.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No hotels found within your budget range.</p>
+          </div>
+        )}
+      </TabsContent>
+    );
+  };
+
+  const renderTransportationTab = () => {
+    return (
+      <TabsContent value="transportation" className="space-y-4">
+        <h3 className="text-xl font-bold mb-4">Transportation to {destinations.find(d => d.id === selectedDestination)?.name}</h3>
+        
+        {selectedDestination && filteredTransportation[selectedDestination] && filteredTransportation[selectedDestination].length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Mode</TableHead>
+                <TableHead>From</TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>Departure</TableHead>
+                <TableHead>Arrival</TableHead>
+                <TableHead>Cost</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTransportation[selectedDestination].map((transport: any, index: number) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center">
+                      {transport.type === 'bus' && <Bus className="mr-2 h-4 w-4" />}
+                      {transport.type === 'train' && <Train className="mr-2 h-4 w-4" />}
+                      {transport.type === 'car' && <Car className="mr-2 h-4 w-4" />}
+                      {transport.name}
+                    </div>
+                  </TableCell>
+                  <TableCell>{transport.from}</TableCell>
+                  <TableCell>{transport.duration}</TableCell>
+                  <TableCell>{transport.departureTime}</TableCell>
+                  <TableCell>{transport.arrivalTime}</TableCell>
+                  <TableCell>₹{transport.cost.toLocaleString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No transportation options found within your budget range.</p>
+          </div>
+        )}
+      </TabsContent>
+    );
+  };
+
+  const renderItineraryTab = () => {
+    return (
+      <TabsContent value="itinerary" id="itinerary-section" className="space-y-4">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-bold">
+            Daily Itinerary for {destinations.find(d => d.id === selectedDestination)?.name}
+          </h3>
+          <div className="text-right">
+            {requiredDays > 0 && (
+              <p className="text-sm text-gray-500">Duration: {requiredDays} days</p>
+            )}
+            <p className="font-bold">Total Cost: ₹{selectedDestination ? calculateTotalCost(selectedDestination).toLocaleString() : 0}</p>
+          </div>
+        </div>
+        
+        {selectedDestination && filteredItineraries[selectedDestination] && filteredItineraries[selectedDestination].length > 0 ? (
+          <div className="space-y-6">
+            {filteredItineraries[selectedDestination].map((day: any) => (
+              <Card key={day.day} className="overflow-hidden">
+                <CardHeader className="bg-travel-light p-4">
+                  <CardTitle className="text-lg">Day {day.day}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-24">Time</TableHead>
+                        <TableHead>Activity</TableHead>
+                        <TableHead className="text-right w-24">Cost</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {day.activities.map((activity: any, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{activity.time}</TableCell>
+                          <TableCell>{activity.activity}</TableCell>
+                          <TableCell className="text-right">₹{activity.cost.toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                      <TableRow>
+                        <TableCell colSpan={2} className="text-right font-bold">
+                          Day Total:
+                        </TableCell>
+                        <TableCell className="text-right font-bold">
+                          ₹{day.activities.reduce((sum: number, activity: any) => sum + activity.cost, 0).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No itinerary available for the selected duration.</p>
+          </div>
+        )}
+      </TabsContent>
+    );
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 z-0 bg-gradient-to-r from-travel-dark to-travel-primary opacity-90">
           <div 
@@ -346,7 +559,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Search Section */}
       <section id="search-section" className="py-16 bg-travel-gray">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -462,7 +674,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Popular Destinations */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Popular Budget-Friendly Destinations</h2>
@@ -508,7 +719,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Trip Details Section */}
       {showTripDetails && selectedDestination && (
         <section id="trip-details-section" className="py-16 bg-travel-light">
           <div className="container mx-auto px-4">
@@ -538,7 +748,6 @@ const Home = () => {
                 </TabsList>
                 
                 <div className="p-4 bg-white rounded-lg mt-4 shadow">
-                  {/* Attractions Tab */}
                   <TabsContent value="attractions" className="space-y-4">
                     <h3 className="text-xl font-bold mb-4">Top Attractions in {destinations.find(d => d.id === selectedDestination)?.name}</h3>
                     
@@ -571,129 +780,16 @@ const Home = () => {
                     )}
                   </TabsContent>
                   
-                  {/* Hotels Tab */}
                   <TabsContent value="hotels" className="space-y-4">
-                    <h3 className="text-xl font-bold mb-4">Hotels in {destinations.find(d => d.id === selectedDestination)?.name}</h3>
-                    
-                    {hotels[selectedDestination as keyof typeof hotels] && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {hotels[selectedDestination as keyof typeof hotels].map((hotel, index) => (
-                          <Card key={index} className="overflow-hidden">
-                            <div className="relative h-48">
-                              <img 
-                                src={hotel.image} 
-                                alt={hotel.name} 
-                                className="absolute inset-0 w-full h-full object-cover"
-                              />
-                            </div>
-                            <CardHeader className="p-4 pb-0">
-                              <CardTitle className="text-lg">{hotel.name}</CardTitle>
-                              <div className="flex items-center text-sm text-gray-500 mt-1">
-                                <span className="font-medium mr-1">{hotel.rating}</span>
-                                <span className="text-yellow-500">★</span>
-                                <span className="mx-2">•</span>
-                                <span>Per night: ₹{hotel.cost.toLocaleString()}</span>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="p-4 pt-2">
-                              <p className="text-sm text-gray-600">{hotel.description}</p>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    )}
+                    {renderHotelsTab()}
                   </TabsContent>
                   
-                  {/* Transportation Tab */}
                   <TabsContent value="transportation" className="space-y-4">
-                    <h3 className="text-xl font-bold mb-4">Transportation to {destinations.find(d => d.id === selectedDestination)?.name}</h3>
-                    
-                    {transportation[selectedDestination as keyof typeof transportation] && (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Mode</TableHead>
-                            <TableHead>From</TableHead>
-                            <TableHead>Duration</TableHead>
-                            <TableHead>Departure</TableHead>
-                            <TableHead>Arrival</TableHead>
-                            <TableHead>Cost</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {transportation[selectedDestination as keyof typeof transportation].map((transport, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium">
-                                <div className="flex items-center">
-                                  {transport.type === 'bus' && <Bus className="mr-2 h-4 w-4" />}
-                                  {transport.type === 'train' && <Train className="mr-2 h-4 w-4" />}
-                                  {transport.type === 'car' && <Car className="mr-2 h-4 w-4" />}
-                                  {transport.name}
-                                </div>
-                              </TableCell>
-                              <TableCell>{transport.from}</TableCell>
-                              <TableCell>{transport.duration}</TableCell>
-                              <TableCell>{transport.departureTime}</TableCell>
-                              <TableCell>{transport.arrivalTime}</TableCell>
-                              <TableCell>₹{transport.cost.toLocaleString()}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
+                    {renderTransportationTab()}
                   </TabsContent>
                   
-                  {/* Itinerary Tab */}
                   <TabsContent value="itinerary" id="itinerary-section" className="space-y-4">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold">
-                        Daily Itinerary for {destinations.find(d => d.id === selectedDestination)?.name}
-                      </h3>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-500">Total duration: {destinations.find(d => d.id === selectedDestination)?.duration}</p>
-                        <p className="font-bold">Total Cost: ₹{calculateTotalCost(selectedDestination).toLocaleString()}</p>
-                      </div>
-                    </div>
-                    
-                    {itineraries[selectedDestination as keyof typeof itineraries] && (
-                      <div className="space-y-6">
-                        {itineraries[selectedDestination as keyof typeof itineraries].map((day) => (
-                          <Card key={day.day} className="overflow-hidden">
-                            <CardHeader className="bg-travel-light p-4">
-                              <CardTitle className="text-lg">Day {day.day}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0">
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead className="w-24">Time</TableHead>
-                                    <TableHead>Activity</TableHead>
-                                    <TableHead className="text-right w-24">Cost</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {day.activities.map((activity, index) => (
-                                    <TableRow key={index}>
-                                      <TableCell className="font-medium">{activity.time}</TableCell>
-                                      <TableCell>{activity.activity}</TableCell>
-                                      <TableCell className="text-right">₹{activity.cost.toLocaleString()}</TableCell>
-                                    </TableRow>
-                                  ))}
-                                  <TableRow>
-                                    <TableCell colSpan={2} className="text-right font-bold">
-                                      Day Total:
-                                    </TableCell>
-                                    <TableCell className="text-right font-bold">
-                                      ₹{day.activities.reduce((sum, activity) => sum + activity.cost, 0).toLocaleString()}
-                                    </TableCell>
-                                  </TableRow>
-                                </TableBody>
-                              </Table>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    )}
+                    {renderItineraryTab()}
                   </TabsContent>
                 </div>
               </Tabs>
@@ -702,7 +798,6 @@ const Home = () => {
         </section>
       )}
 
-      {/* Call to Action */}
       <section className="py-16 bg-travel-primary text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
