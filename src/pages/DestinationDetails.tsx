@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -423,3 +424,186 @@ const DestinationDetails = () => {
                           className="absolute inset-0 w-full h-full object-cover"
                         />
                       </div>
+                      <CardHeader className="pt-4 pb-2">
+                        <CardTitle className="text-lg">{attraction.name}</CardTitle>
+                        <div className="flex items-center text-sm mt-1">
+                          <span className="font-medium mr-1">{attraction.rating}</span>
+                          <span className="text-yellow-500">★</span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <p className="text-sm text-gray-600">{attraction.description}</p>
+                      </CardContent>
+                      <CardFooter className="pt-0 flex justify-between items-center">
+                        <span className="text-travel-primary font-bold">
+                          {attraction.cost > 0 ? `₹${attraction.cost}` : 'Free Entry'}
+                        </span>
+                        <Button size="sm" variant="outline">Add to Plan</Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="hotels" className="space-y-4">
+              <h3 className="text-xl font-bold mb-4">Accommodations in {destination.name}</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Showing hotels that fit within your budget for {requiredDays} days.
+              </p>
+              
+              {filteredHotels.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredHotels.map((hotel, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <div className="relative h-48">
+                        <img 
+                          src={hotel.image} 
+                          alt={hotel.name} 
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                      <CardHeader className="pt-4 pb-2">
+                        <CardTitle className="text-lg">{hotel.name}</CardTitle>
+                        <div className="flex items-center text-sm mt-1">
+                          <span className="font-medium mr-1">{hotel.rating}</span>
+                          <span className="text-yellow-500">★</span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <p className="text-sm text-gray-600">{hotel.description}</p>
+                      </CardContent>
+                      <CardFooter className="pt-0 flex justify-between items-center">
+                        <div>
+                          <span className="text-travel-primary font-bold">₹{hotel.cost}</span>
+                          <span className="text-sm text-gray-500"> / night</span>
+                        </div>
+                        <Button size="sm" variant="outline">Book Now</Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-lg text-gray-500">No hotels found within your budget for {requiredDays} days.</p>
+                  <p className="text-sm text-gray-400 mt-2">Try increasing your budget or reducing your stay duration.</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="transportation" className="space-y-4">
+              <h3 className="text-xl font-bold mb-4">Transportation Options to {destination.name}</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Showing transportation options within your budget.
+              </p>
+              
+              {filteredTransportation.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Mode</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>From</TableHead>
+                        <TableHead>Duration</TableHead>
+                        <TableHead>Departure</TableHead>
+                        <TableHead>Arrival</TableHead>
+                        <TableHead>Cost</TableHead>
+                        <TableHead></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredTransportation.map((transport, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            <div className="flex items-center">
+                              {transport.type === 'bus' && <Bus className="h-4 w-4 mr-2" />}
+                              {transport.type === 'train' && <Train className="h-4 w-4 mr-2" />}
+                              {transport.type === 'car' && <Car className="h-4 w-4 mr-2" />}
+                              {transport.type.charAt(0).toUpperCase() + transport.type.slice(1)}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium">{transport.name}</TableCell>
+                          <TableCell>{transport.from}</TableCell>
+                          <TableCell>{transport.duration}</TableCell>
+                          <TableCell>{transport.departureTime}</TableCell>
+                          <TableCell>{transport.arrivalTime}</TableCell>
+                          <TableCell className="font-bold text-travel-primary">₹{transport.cost}</TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline">Book</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-lg text-gray-500">No transportation options found within your budget.</p>
+                  <p className="text-sm text-gray-400 mt-2">Try increasing your budget to see more options.</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="itinerary" id="itinerary-section" className="space-y-4">
+              <h3 className="text-xl font-bold mb-4">{destination.duration} Itinerary in {destination.name}</h3>
+              
+              {itineraries[destination.id as keyof typeof itineraries] && (
+                <>
+                  <div className="bg-travel-gray/20 p-4 rounded-lg mb-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                      <h4 className="text-lg font-medium">Total Estimated Cost</h4>
+                      <span className="text-2xl font-bold text-travel-primary">
+                        ₹{calculateTotalCost(destination.id).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      This is an approximate cost for activities mentioned in the itinerary. 
+                      Transportation and accommodation costs are not included.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-8">
+                    {itineraries[destination.id as keyof typeof itineraries].map((day, dayIndex) => (
+                      <div key={dayIndex} className="bg-white rounded-lg border p-4">
+                        <h4 className="text-lg font-bold mb-4 pb-2 border-b">Day {day.day}</h4>
+                        <div className="space-y-4">
+                          {day.activities.map((activity, actIndex) => (
+                            <div key={actIndex} className="flex items-start">
+                              <div className="bg-travel-primary/10 rounded-full p-2 mr-4 mt-1">
+                                <Clock className="h-4 w-4 text-travel-primary" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+                                  <div>
+                                    <span className="font-medium">{activity.time}</span>
+                                    <h5 className="text-md font-bold">{activity.activity}</h5>
+                                  </div>
+                                  <span className="text-travel-primary font-bold mt-1 md:mt-0">
+                                    ₹{activity.cost}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-8 flex justify-center">
+                    <Button className="bg-travel-primary hover:bg-travel-primary/90">
+                      Book This Itinerary
+                    </Button>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+    </div>
+  );
+};
+
+export default DestinationDetails;
