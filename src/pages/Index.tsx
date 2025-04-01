@@ -12,6 +12,7 @@ import { Plane, Hotel, MapPin, Calendar, Globe, Search, ArrowRight, Clock, Bus, 
 import { format, differenceInDays } from 'date-fns';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { 
   Select,
   SelectContent,
