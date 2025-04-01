@@ -5,11 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { MapPin, Hotel, Calendar, Bus, Train, Car, ArrowLeft } from 'lucide-react';
+import { MapPin, Hotel, Bus, Train, Car, Calendar, Clock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
-// Import mock data from the destinations page for now
-// In a real app, this would come from an API or a shared data store
+// Mock data (same as in TripResults.tsx)
 const destinations = [
   {
     id: 1,
@@ -18,8 +17,7 @@ const destinations = [
     image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=500&auto=format&fit=crop',
     budget: 15000,
     duration: '3 days',
-    rating: 4.7,
-    category: 'cultural'
+    rating: 4.7
   },
   {
     id: 2,
@@ -28,8 +26,7 @@ const destinations = [
     image: 'https://images.unsplash.com/photo-1602517807959-3a3a71f74349?q=80&w=500&auto=format&fit=crop',
     budget: 20000,
     duration: '4 days',
-    rating: 4.9,
-    category: 'cultural'
+    rating: 4.9
   },
   {
     id: 3,
@@ -38,8 +35,7 @@ const destinations = [
     image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=500&auto=format&fit=crop',
     budget: 25000,
     duration: '5 days',
-    rating: 4.5,
-    category: 'beach'
+    rating: 4.5
   },
   {
     id: 4,
@@ -48,48 +44,7 @@ const destinations = [
     image: 'https://images.unsplash.com/photo-1602158123364-bdc73653ece4?q=80&w=500&auto=format&fit=crop',
     budget: 30000,
     duration: '6 days',
-    rating: 4.8,
-    category: 'nature'
-  },
-  {
-    id: 5,
-    name: 'Manali',
-    description: 'Mountain retreat with snow-capped peaks and adventure sports',
-    image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=500&auto=format&fit=crop',
-    budget: 22000,
-    duration: '5 days',
-    rating: 4.6,
-    category: 'mountain'
-  },
-  {
-    id: 6,
-    name: 'Andaman Islands',
-    description: 'Pristine beaches and crystal clear waters for the perfect getaway',
-    image: 'https://images.unsplash.com/photo-1586640931889-dcc3baac6814?q=80&w=500&auto=format&fit=crop',
-    budget: 35000,
-    duration: '7 days',
-    rating: 4.9,
-    category: 'beach'
-  },
-  {
-    id: 7,
-    name: 'Darjeeling',
-    description: 'Tea plantations and colonial charm with Himalayan views',
-    image: 'https://images.unsplash.com/photo-1544914379-806667cd9489?q=80&w=500&auto=format&fit=crop',
-    budget: 18000,
-    duration: '4 days',
-    rating: 4.5,
-    category: 'mountain'
-  },
-  {
-    id: 8,
-    name: 'Varanasi',
-    description: 'Ancient spiritual city on the banks of the sacred Ganges',
-    image: 'https://images.unsplash.com/photo-1561361058-c24cecde1109?q=80&w=500&auto=format&fit=crop',
-    budget: 12000,
-    duration: '3 days',
-    rating: 4.3,
-    category: 'cultural'
+    rating: 4.8
   }
 ];
 
@@ -147,33 +102,6 @@ const hotels = {
   ]
 };
 
-const transportation = {
-  1: [
-    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Delhi', duration: '6 hours', cost: 800, departureTime: '10:00 PM', arrivalTime: '04:00 AM' },
-    { type: 'train', name: 'Shatabdi Express', from: 'Delhi', duration: '4.5 hours', cost: 1200, departureTime: '06:00 AM', arrivalTime: '10:30 AM' },
-    { type: 'bus', name: 'RSRTC Non-AC', from: 'Delhi', duration: '7 hours', cost: 500, departureTime: '09:00 PM', arrivalTime: '04:00 AM' },
-    { type: 'train', name: 'Jaipur Express', from: 'Delhi', duration: '5 hours', cost: 900, departureTime: '11:00 PM', arrivalTime: '04:00 AM' }
-  ],
-  2: [
-    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Delhi', duration: '12 hours', cost: 1500, departureTime: '07:00 PM', arrivalTime: '07:00 AM' },
-    { type: 'train', name: 'Mewar Express', from: 'Delhi', duration: '10 hours', cost: 1800, departureTime: '08:00 PM', arrivalTime: '06:00 AM' },
-    { type: 'bus', name: 'GSRTC Semi-Sleeper', from: 'Delhi', duration: '14 hours', cost: 1200, departureTime: '06:00 PM', arrivalTime: '08:00 AM' },
-    { type: 'train', name: 'Udaipur Express', from: 'Delhi', duration: '11 hours', cost: 1500, departureTime: '09:00 PM', arrivalTime: '08:00 AM' }
-  ],
-  3: [
-    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Mumbai', duration: '10 hours', cost: 1200, departureTime: '08:00 PM', arrivalTime: '06:00 AM' },
-    { type: 'train', name: 'Goa Express', from: 'Mumbai', duration: '8 hours', cost: 1500, departureTime: '11:00 PM', arrivalTime: '07:00 AM' },
-    { type: 'bus', name: 'MSRTC AC Shivneri', from: 'Mumbai', duration: '11 hours', cost: 1000, departureTime: '07:00 PM', arrivalTime: '06:00 AM' },
-    { type: 'train', name: 'Jan Shatabdi', from: 'Mumbai', duration: '9 hours', cost: 1300, departureTime: '06:00 AM', arrivalTime: '03:00 PM' }
-  ],
-  4: [
-    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Bangalore', duration: '8 hours', cost: 1000, departureTime: '09:00 PM', arrivalTime: '05:00 AM' },
-    { type: 'train', name: 'Island Express', from: 'Chennai', duration: '12 hours', cost: 900, departureTime: '07:00 PM', arrivalTime: '07:00 AM' },
-    { type: 'bus', name: 'KSRTC Super Deluxe', from: 'Bangalore', duration: '9 hours', cost: 800, departureTime: '08:00 PM', arrivalTime: '05:00 AM' },
-    { type: 'train', name: 'Kerala Express', from: 'Delhi', duration: '36 hours', cost: 2500, departureTime: '11:00 AM', arrivalTime: '11:00 PM (next day)' }
-  ]
-};
-
 const itineraries = {
   1: [
     {
@@ -222,24 +150,6 @@ const itineraries = {
         { time: '03:00 PM', activity: 'Explore Bagore Ki Haveli', cost: 500 },
         { time: '08:00 PM', activity: 'Cultural show at Bagore Ki Haveli', cost: 1000 }
       ]
-    },
-    {
-      day: 3,
-      activities: [
-        { time: '09:00 AM', activity: 'Visit Sajjangarh Palace', cost: 800 },
-        { time: '12:00 PM', activity: 'Lunch at Upre Restaurant', cost: 1200 },
-        { time: '02:00 PM', activity: 'Shopping at Hathi Pol Bazaar', cost: 1500 },
-        { time: '07:00 PM', activity: 'Dinner cruise on Lake Pichola', cost: 2500 }
-      ]
-    },
-    {
-      day: 4,
-      activities: [
-        { time: '10:00 AM', activity: 'Visit Saheliyon Ki Bari', cost: 500 },
-        { time: '01:00 PM', activity: 'Lunch at Tribute Restaurant', cost: 1000 },
-        { time: '03:00 PM', activity: 'Explore Vintage Car Museum', cost: 400 },
-        { time: '07:00 PM', activity: 'Farewell dinner at Raas Leela', cost: 1800 }
-      ]
     }
   ],
   3: [
@@ -266,341 +176,313 @@ const itineraries = {
   ]
 };
 
+const transportation = {
+  1: [
+    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Delhi', duration: '6 hours', cost: 800, departureTime: '10:00 PM', arrivalTime: '04:00 AM' },
+    { type: 'train', name: 'Shatabdi Express', from: 'Delhi', duration: '4.5 hours', cost: 1200, departureTime: '06:00 AM', arrivalTime: '10:30 AM' }
+  ],
+  2: [
+    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Delhi', duration: '12 hours', cost: 1500, departureTime: '07:00 PM', arrivalTime: '07:00 AM' },
+    { type: 'train', name: 'Mewar Express', from: 'Delhi', duration: '10 hours', cost: 1800, departureTime: '08:00 PM', arrivalTime: '06:00 AM' }
+  ],
+  3: [
+    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Mumbai', duration: '10 hours', cost: 1200, departureTime: '08:00 PM', arrivalTime: '06:00 AM' },
+    { type: 'train', name: 'Goa Express', from: 'Mumbai', duration: '8 hours', cost: 1500, departureTime: '11:00 PM', arrivalTime: '07:00 AM' }
+  ],
+  4: [
+    { type: 'bus', name: 'Volvo AC Sleeper', from: 'Bangalore', duration: '8 hours', cost: 1000, departureTime: '09:00 PM', arrivalTime: '05:00 AM' },
+    { type: 'train', name: 'Island Express', from: 'Chennai', duration: '12 hours', cost: 900, departureTime: '07:00 PM', arrivalTime: '07:00 AM' }
+  ]
+};
+
 const DestinationDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [budget, setBudget] = useState<number>(20000);
-  const [detailsTab, setDetailsTab] = useState('attractions');
-  const [filteredHotels, setFilteredHotels] = useState<any[]>([]);
-  const [filteredTransportation, setFilteredTransportation] = useState<any[]>([]);
-  const [destination, setDestination] = useState<any>(null);
-  const [requiredDays, setRequiredDays] = useState<number>(0);
+  const [detailsTab, setDetailsTab] = useState("attractions");
+  
+  const destinationId = id ? parseInt(id, 10) : null;
+  const destination = destinations.find(d => d.id === destinationId);
   
   useEffect(() => {
-    if (!id) return;
-    
-    const destId = parseInt(id, 10);
-    const dest = destinations.find(d => d.id === destId);
-    
-    if (!dest) {
+    if (!destination) {
       toast({
         title: "Destination not found",
         description: "The destination you're looking for doesn't exist",
-        variant: "destructive"
+        duration: 3000,
       });
       navigate('/destinations');
-      return;
     }
-    
-    setDestination(dest);
-    
-    // Extract number of days from duration string (e.g., "3 days" -> 3)
-    const days = parseInt(dest.duration.split(' ')[0], 10);
-    setRequiredDays(days);
-    
-    // Filter hotels by budget
-    if (hotels[destId as keyof typeof hotels]) {
-      const hotelsList = hotels[destId as keyof typeof hotels].filter(
-        (hotel: any) => hotel.cost * days <= budget
-      );
-      setFilteredHotels(hotelsList);
-    }
-    
-    // Filter transportation by budget
-    if (transportation[destId as keyof typeof transportation]) {
-      const transportList = transportation[destId as keyof typeof transportation].filter(
-        (transport: any) => transport.cost <= budget
-      );
-      setFilteredTransportation(transportList);
-    }
-  }, [id, navigate, toast, budget]);
+  }, [destination, navigate, toast]);
 
   if (!destination) {
-    return <div className="container mx-auto px-4 py-8 text-center">Loading...</div>;
-  }
-
-  const calculateTotalCost = (destId: number) => {
-    if (!itineraries[destId as keyof typeof itineraries]) return 0;
-    
-    return itineraries[destId as keyof typeof itineraries].reduce((total: number, day: any) => {
-      const dayCost = day.activities.reduce((sum: number, activity: any) => sum + activity.cost, 0);
-      return total + dayCost;
-    }, 0);
-  };
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <Button 
-          variant="outline" 
-          onClick={() => navigate('/destinations')}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Destinations
-        </Button>
-        
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-1/2">
-            <img 
-              src={destination.image} 
-              alt={destination.name} 
-              className="w-full h-80 object-cover rounded-lg shadow-md"
-            />
-          </div>
-          <div className="md:w-1/2">
-            <h1 className="text-3xl font-bold mb-2">{destination.name}</h1>
-            <p className="text-lg text-gray-700 mb-4">{destination.description}</p>
-            
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-travel-primary mr-2" />
-                <span>{destination.duration}</span>
-              </div>
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 text-travel-primary mr-2" />
-                <span>{destination.category.charAt(0).toUpperCase() + destination.category.slice(1)}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="font-medium mr-1">{destination.rating}</span>
-                <span className="text-yellow-500">★</span>
-              </div>
-              <div className="flex items-center">
-                <span className="font-bold">₹{destination.budget.toLocaleString()}</span>
-              </div>
-            </div>
-            
-            <Button 
-              className="w-full bg-travel-primary hover:bg-travel-primary/90"
-              onClick={() => {
-                setDetailsTab('itinerary');
-                setTimeout(() => {
-                  document.getElementById('itinerary-section')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-            >
-              View Full Itinerary
-            </Button>
-          </div>
+    return (
+      <div className="min-h-screen py-16 container mx-auto px-4">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">Destination not found</h1>
+          <Button onClick={() => navigate('/destinations')} className="mt-4">
+            Return to Destinations
+          </Button>
         </div>
       </div>
+    );
+  }
+
+  const renderAttractionsTab = () => (
+    <div className="space-y-4">
+      <h3 className="text-xl font-bold mb-4">Top Attractions in {destination.name}</h3>
       
-      <div className="my-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">Plan Your Trip to {destination.name}</h2>
+      {attractions[destinationId as keyof typeof attractions] && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {attractions[destinationId as keyof typeof attractions].map((attraction, index) => (
+            <Card key={index} className="overflow-hidden">
+              <div className="relative h-48">
+                <img 
+                  src={attraction.image} 
+                  alt={attraction.name} 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader className="p-4 pb-0">
+                <CardTitle className="text-lg">{attraction.name}</CardTitle>
+                <div className="flex items-center text-sm text-gray-500 mt-1">
+                  <span className="font-medium mr-1">{attraction.rating}</span>
+                  <span className="text-yellow-500">★</span>
+                  <span className="mx-2">•</span>
+                  <span>Entry: ₹{attraction.cost.toLocaleString()}</span>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <p className="text-sm text-gray-600">{attraction.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderHotelsTab = () => (
+    <div className="space-y-4">
+      <h3 className="text-xl font-bold mb-4">Hotels in {destination.name}</h3>
+      
+      {hotels[destinationId as keyof typeof hotels] && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {hotels[destinationId as keyof typeof hotels].map((hotel, index) => (
+            <Card key={index} className="overflow-hidden">
+              <div className="relative h-48">
+                <img 
+                  src={hotel.image} 
+                  alt={hotel.name} 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader className="p-4 pb-0">
+                <CardTitle className="text-lg">{hotel.name}</CardTitle>
+                <div className="flex items-center text-sm text-gray-500 mt-1">
+                  <span className="font-medium mr-1">{hotel.rating}</span>
+                  <span className="text-yellow-500">★</span>
+                  <span className="mx-2">•</span>
+                  <span>Per night: ₹{hotel.cost.toLocaleString()}</span>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <p className="text-sm text-gray-600">{hotel.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderTransportationTab = () => (
+    <div className="space-y-4">
+      <h3 className="text-xl font-bold mb-4">Transportation to {destination.name}</h3>
+      
+      {transportation[destinationId as keyof typeof transportation] && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Mode</TableHead>
+              <TableHead>From</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Departure</TableHead>
+              <TableHead>Arrival</TableHead>
+              <TableHead>Cost</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {transportation[destinationId as keyof typeof transportation].map((transport, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center">
+                    {transport.type === 'bus' && <Bus className="mr-2 h-4 w-4" />}
+                    {transport.type === 'train' && <Train className="mr-2 h-4 w-4" />}
+                    {transport.type === 'car' && <Car className="mr-2 h-4 w-4" />}
+                    {transport.name}
+                  </div>
+                </TableCell>
+                <TableCell>{transport.from}</TableCell>
+                <TableCell>{transport.duration}</TableCell>
+                <TableCell>{transport.departureTime}</TableCell>
+                <TableCell>{transport.arrivalTime}</TableCell>
+                <TableCell>₹{transport.cost.toLocaleString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
+
+  const renderItineraryTab = () => {
+    const calculateTotalCost = (activities: any[]) => {
+      return activities.reduce((sum, activity) => sum + activity.cost, 0);
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-bold">
+            Daily Itinerary for {destination.name}
+          </h3>
+        </div>
         
-        <Tabs value={detailsTab} onValueChange={setDetailsTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-4">
-            <TabsTrigger value="attractions">
-              <MapPin className="mr-2 h-4 w-4" />
-              Attractions
-            </TabsTrigger>
-            <TabsTrigger value="hotels">
-              <Hotel className="mr-2 h-4 w-4" />
-              Hotels
-            </TabsTrigger>
-            <TabsTrigger value="transportation">
-              <Bus className="mr-2 h-4 w-4" />
-              Transportation
-            </TabsTrigger>
-            <TabsTrigger value="itinerary">
-              <Calendar className="mr-2 h-4 w-4" />
-              Itinerary
-            </TabsTrigger>
-          </TabsList>
-          
-          <div className="p-4 bg-white rounded-lg mt-4 shadow">
-            <TabsContent value="attractions" className="space-y-4">
-              <h3 className="text-xl font-bold mb-4">Top Attractions in {destination.name}</h3>
-              
-              {attractions[destination.id as keyof typeof attractions] && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {attractions[destination.id as keyof typeof attractions].map((attraction, index) => (
-                    <Card key={index} className="overflow-hidden">
-                      <div className="relative h-48">
-                        <img 
-                          src={attraction.image} 
-                          alt={attraction.name} 
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      </div>
-                      <CardHeader className="pt-4 pb-2">
-                        <CardTitle className="text-lg">{attraction.name}</CardTitle>
-                        <div className="flex items-center text-sm mt-1">
-                          <span className="font-medium mr-1">{attraction.rating}</span>
-                          <span className="text-yellow-500">★</span>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-2">
-                        <p className="text-sm text-gray-600">{attraction.description}</p>
-                      </CardContent>
-                      <CardFooter className="pt-0 flex justify-between items-center">
-                        <span className="text-travel-primary font-bold">
-                          {attraction.cost > 0 ? `₹${attraction.cost}` : 'Free Entry'}
-                        </span>
-                        <Button size="sm" variant="outline">Add to Plan</Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="hotels" className="space-y-4">
-              <h3 className="text-xl font-bold mb-4">Accommodations in {destination.name}</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Showing hotels that fit within your budget for {requiredDays} days.
-              </p>
-              
-              {filteredHotels.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredHotels.map((hotel, index) => (
-                    <Card key={index} className="overflow-hidden">
-                      <div className="relative h-48">
-                        <img 
-                          src={hotel.image} 
-                          alt={hotel.name} 
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      </div>
-                      <CardHeader className="pt-4 pb-2">
-                        <CardTitle className="text-lg">{hotel.name}</CardTitle>
-                        <div className="flex items-center text-sm mt-1">
-                          <span className="font-medium mr-1">{hotel.rating}</span>
-                          <span className="text-yellow-500">★</span>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-2">
-                        <p className="text-sm text-gray-600">{hotel.description}</p>
-                      </CardContent>
-                      <CardFooter className="pt-0 flex justify-between items-center">
-                        <div>
-                          <span className="text-travel-primary font-bold">₹{hotel.cost}</span>
-                          <span className="text-sm text-gray-500"> / night</span>
-                        </div>
-                        <Button size="sm" variant="outline">Book Now</Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-lg text-gray-500">No hotels found within your budget for {requiredDays} days.</p>
-                  <p className="text-sm text-gray-400 mt-2">Try increasing your budget or reducing your stay duration.</p>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="transportation" className="space-y-4">
-              <h3 className="text-xl font-bold mb-4">Transportation Options to {destination.name}</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Showing transportation options within your budget.
-              </p>
-              
-              {filteredTransportation.length > 0 ? (
-                <div className="overflow-x-auto">
+        {itineraries[destinationId as keyof typeof itineraries] && (
+          <div className="space-y-6">
+            {itineraries[destinationId as keyof typeof itineraries].map((day) => (
+              <Card key={day.day} className="overflow-hidden">
+                <CardHeader className="bg-travel-light p-4">
+                  <CardTitle className="text-lg">Day {day.day}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Mode</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>From</TableHead>
-                        <TableHead>Duration</TableHead>
-                        <TableHead>Departure</TableHead>
-                        <TableHead>Arrival</TableHead>
-                        <TableHead>Cost</TableHead>
-                        <TableHead></TableHead>
+                        <TableHead className="w-24">Time</TableHead>
+                        <TableHead>Activity</TableHead>
+                        <TableHead className="text-right w-24">Cost</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredTransportation.map((transport, index) => (
+                      {day.activities.map((activity, index) => (
                         <TableRow key={index}>
-                          <TableCell>
-                            <div className="flex items-center">
-                              {transport.type === 'bus' && <Bus className="h-4 w-4 mr-2" />}
-                              {transport.type === 'train' && <Train className="h-4 w-4 mr-2" />}
-                              {transport.type === 'car' && <Car className="h-4 w-4 mr-2" />}
-                              {transport.type.charAt(0).toUpperCase() + transport.type.slice(1)}
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-medium">{transport.name}</TableCell>
-                          <TableCell>{transport.from}</TableCell>
-                          <TableCell>{transport.duration}</TableCell>
-                          <TableCell>{transport.departureTime}</TableCell>
-                          <TableCell>{transport.arrivalTime}</TableCell>
-                          <TableCell className="font-bold text-travel-primary">₹{transport.cost}</TableCell>
-                          <TableCell>
-                            <Button size="sm" variant="outline">Book</Button>
-                          </TableCell>
+                          <TableCell className="font-medium">{activity.time}</TableCell>
+                          <TableCell>{activity.activity}</TableCell>
+                          <TableCell className="text-right">₹{activity.cost.toLocaleString()}</TableCell>
                         </TableRow>
                       ))}
+                      <TableRow>
+                        <TableCell colSpan={2} className="text-right font-bold">
+                          Day Total:
+                        </TableCell>
+                        <TableCell className="text-right font-bold">
+                          ₹{calculateTotalCost(day.activities).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
                     </TableBody>
                   </Table>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-lg text-gray-500">No transportation options found within your budget.</p>
-                  <p className="text-sm text-gray-400 mt-2">Try increasing your budget to see more options.</p>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="itinerary" id="itinerary-section" className="space-y-4">
-              <h3 className="text-xl font-bold mb-4">{destination.duration} Itinerary in {destination.name}</h3>
-              
-              {itineraries[destination.id as keyof typeof itineraries] && (
-                <>
-                  <div className="bg-travel-gray/20 p-4 rounded-lg mb-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-                      <h4 className="text-lg font-medium">Total Estimated Cost</h4>
-                      <span className="text-2xl font-bold text-travel-primary">
-                        ₹{calculateTotalCost(destination.id).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      This is an approximate cost for activities mentioned in the itinerary. 
-                      Transportation and accommodation costs are not included.
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-8">
-                    {itineraries[destination.id as keyof typeof itineraries].map((day, dayIndex) => (
-                      <div key={dayIndex} className="bg-white rounded-lg border p-4">
-                        <h4 className="text-lg font-bold mb-4 pb-2 border-b">Day {day.day}</h4>
-                        <div className="space-y-4">
-                          {day.activities.map((activity, actIndex) => (
-                            <div key={actIndex} className="flex items-start">
-                              <div className="bg-travel-primary/10 rounded-full p-2 mr-4 mt-1">
-                                <Clock className="h-4 w-4 text-travel-primary" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-                                  <div>
-                                    <span className="font-medium">{activity.time}</span>
-                                    <h5 className="text-md font-bold">{activity.activity}</h5>
-                                  </div>
-                                  <span className="text-travel-primary font-bold mt-1 md:mt-0">
-                                    ₹{activity.cost}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-8 flex justify-center">
-                    <Button className="bg-travel-primary hover:bg-travel-primary/90">
-                      Book This Itinerary
-                    </Button>
-                  </div>
-                </>
-              )}
-            </TabsContent>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </Tabs>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen py-16">
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <Button 
+              variant="outline" 
+              className="mb-4"
+              onClick={() => navigate('/destinations')}
+            >
+              ← Back to Destinations
+            </Button>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="md:col-span-1">
+                <div className="rounded-lg overflow-hidden shadow-md h-64 mb-4">
+                  <img 
+                    src={destination.image} 
+                    alt={destination.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="bg-white rounded-lg shadow-md p-5">
+                  <h2 className="text-2xl font-bold mb-2">{destination.name}</h2>
+                  <p className="text-gray-600 mb-4">{destination.description}</p>
+                  
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                      <span className="text-gray-700">{destination.duration}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="font-medium mr-1 text-travel-primary">{destination.rating}</span>
+                      <span className="text-yellow-500">★</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="text-xl font-bold text-travel-primary">
+                      ₹{destination.budget.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-500">Estimated budget</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="md:col-span-2">
+                <div className="bg-white rounded-lg shadow-md p-5">
+                  <Tabs value={detailsTab} onValueChange={setDetailsTab} className="w-full">
+                    <TabsList className="w-full grid grid-cols-4">
+                      <TabsTrigger value="attractions">
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Attractions
+                      </TabsTrigger>
+                      <TabsTrigger value="hotels">
+                        <Hotel className="mr-2 h-4 w-4" />
+                        Hotels
+                      </TabsTrigger>
+                      <TabsTrigger value="transportation">
+                        <Bus className="mr-2 h-4 w-4" />
+                        Transportation
+                      </TabsTrigger>
+                      <TabsTrigger value="itinerary">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Itinerary
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <div className="p-4 bg-white rounded-lg mt-4">
+                      <TabsContent value="attractions">
+                        {renderAttractionsTab()}
+                      </TabsContent>
+                      
+                      <TabsContent value="hotels">
+                        {renderHotelsTab()}
+                      </TabsContent>
+                      
+                      <TabsContent value="transportation">
+                        {renderTransportationTab()}
+                      </TabsContent>
+                      
+                      <TabsContent value="itinerary">
+                        {renderItineraryTab()}
+                      </TabsContent>
+                    </div>
+                  </Tabs>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

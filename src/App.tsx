@@ -11,6 +11,7 @@ import DestinationDetails from "./pages/DestinationDetails";
 import PackingAssistant from "./pages/PackingAssistant";
 import ChatGuide from "./pages/ChatGuide";
 import NotFound from "./pages/NotFound";
+import TripResults from "./pages/TripResults";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/destinations" element={<Destinations />} />
             <Route path="/destinations/:id" element={<DestinationDetails />} />
+            <Route path="/trip-results" element={<TripResults />} />
             <Route path="/packing-assistant" element={<PackingAssistant />} />
             <Route path="/chat" element={<ChatGuide />} />
             <Route path="*" element={<NotFound />} />
