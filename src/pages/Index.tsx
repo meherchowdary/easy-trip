@@ -302,12 +302,12 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {destinations.map((destination) => (
               <Card key={destination.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative h-48">
-                  <AspectRatio ratio={16 / 9} className="h-full">
+                <div className="relative">
+                  <AspectRatio ratio={16 / 10} className="bg-muted">
                     <img 
                       src={destination.image} 
                       alt={destination.name} 
-                      className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = "https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?q=80&w=500&auto=format&fit=crop";
@@ -315,8 +315,8 @@ const Home = () => {
                     />
                   </AspectRatio>
                 </div>
-                <CardHeader className="p-4 pb-0">
-                  <CardTitle className="text-xl">{destination.name}</CardTitle>
+                <CardHeader className="p-4 pb-0 pt-3">
+                  <CardTitle className="text-xl mb-1">{destination.name}</CardTitle>
                   <div className="flex items-center text-sm text-gray-500 mt-1">
                     <Clock className="h-3.5 w-3.5 mr-1" />
                     <span>{destination.duration}</span>

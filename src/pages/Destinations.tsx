@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, Hotel, Utensils, Search, SlidersHorizontal } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 
-// Mock data
 const destinations = [
   {
     id: 1,
@@ -208,7 +206,7 @@ const DestinationGrid = ({ destinations }: { destinations: any[] }) => {
       {destinations.map((destination) => (
         <Card key={destination.id} className="overflow-hidden hover:shadow-lg transition-shadow">
           <div className="relative">
-            <AspectRatio ratio={16 / 9} className="bg-muted">
+            <AspectRatio ratio={16 / 10} className="bg-muted">
               <img 
                 src={destination.image} 
                 alt={destination.name} 
@@ -223,12 +221,12 @@ const DestinationGrid = ({ destinations }: { destinations: any[] }) => {
               </div>
             </AspectRatio>
           </div>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center">
+          <CardHeader className="pb-2 pt-4">
+            <CardTitle className="flex items-center text-xl">
               <MapPin className="w-4 h-4 mr-2 text-travel-secondary" />
               {destination.name}
             </CardTitle>
-            <CardDescription className="line-clamp-2">{destination.description}</CardDescription>
+            <CardDescription className="line-clamp-2 mt-1">{destination.description}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 pb-2">
             <div className="flex items-center text-sm text-gray-600">
