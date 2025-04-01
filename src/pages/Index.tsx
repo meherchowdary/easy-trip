@@ -12,6 +12,13 @@ import { Plane, Hotel, MapPin, Calendar, Globe, Search, ArrowRight, Clock, Bus, 
 import { format, differenceInDays } from 'date-fns';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue 
+} from "@/components/ui/select";
 import { cn } from '@/lib/utils';
 
 const destinations = [
@@ -51,6 +58,28 @@ const destinations = [
     duration: '6 days',
     rating: 4.8
   }
+];
+
+// List of Indian cities for the dropdown
+const indianCities = [
+  { value: "agra", label: "Agra" },
+  { value: "ahmedabad", label: "Ahmedabad" },
+  { value: "amritsar", label: "Amritsar" },
+  { value: "bangalore", label: "Bangalore" },
+  { value: "chennai", label: "Chennai" },
+  { value: "darjeeling", label: "Darjeeling" },
+  { value: "delhi", label: "Delhi" },
+  { value: "goa", label: "Goa" },
+  { value: "hyderabad", label: "Hyderabad" },
+  { value: "jaipur", label: "Jaipur" },
+  { value: "jodhpur", label: "Jodhpur" },
+  { value: "kerala", label: "Kerala" },
+  { value: "kolkata", label: "Kolkata" },
+  { value: "manali", label: "Manali" },
+  { value: "mumbai", label: "Mumbai" },
+  { value: "shimla", label: "Shimla" },
+  { value: "udaipur", label: "Udaipur" },
+  { value: "varanasi", label: "Varanasi" }
 ];
 
 const Home = () => {
@@ -151,16 +180,18 @@ const Home = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                   <Label htmlFor="destination" className="mb-2 block">Where to?</Label>
-                  <div className="relative">
-                    <Input 
-                      id="destination" 
-                      placeholder="Search destinations" 
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  </div>
+                  <Select onValueChange={setSearchQuery}>
+                    <SelectTrigger id="destination" className="w-full">
+                      <SelectValue placeholder="Select a destination" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {indianCities.map((city) => (
+                        <SelectItem key={city.value} value={city.value}>
+                          {city.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div>
