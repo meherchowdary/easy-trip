@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, Hotel, Utensils, Search, SlidersHorizontal } from 'lucide-react';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 // Mock data
 const destinations = [
@@ -206,15 +207,21 @@ const DestinationGrid = ({ destinations }: { destinations: any[] }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {destinations.map((destination) => (
         <Card key={destination.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-          <div className="relative h-48 overflow-hidden">
-            <img 
-              src={destination.image} 
-              alt={destination.name} 
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute top-2 right-2 bg-white/90 text-travel-primary text-sm font-medium py-1 px-2 rounded">
-              ₹{destination.budget.toLocaleString()}
-            </div>
+          <div className="relative">
+            <AspectRatio ratio={16 / 9} className="bg-muted">
+              <img 
+                src={destination.image} 
+                alt={destination.name} 
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 rounded-t-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?q=80&w=500&auto=format&fit=crop";
+                }}
+              />
+              <div className="absolute top-2 right-2 bg-white/90 text-travel-primary text-sm font-medium py-1 px-2 rounded">
+                ₹{destination.budget.toLocaleString()}
+              </div>
+            </AspectRatio>
           </div>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center">

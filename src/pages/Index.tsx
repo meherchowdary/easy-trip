@@ -302,11 +302,17 @@ const Home = () => {
             {destinations.map((destination) => (
               <Card key={destination.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative h-48">
-                  <img 
-                    src={destination.image} 
-                    alt={destination.name} 
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
+                  <AspectRatio ratio={16 / 9} className="h-full">
+                    <img 
+                      src={destination.image} 
+                      alt={destination.name} 
+                      className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?q=80&w=500&auto=format&fit=crop";
+                      }}
+                    />
+                  </AspectRatio>
                 </div>
                 <CardHeader className="p-4 pb-0">
                   <CardTitle className="text-xl">{destination.name}</CardTitle>
