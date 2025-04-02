@@ -12,6 +12,7 @@ import PackingAssistant from "./pages/PackingAssistant";
 import ChatGuide from "./pages/ChatGuide";
 import NotFound from "./pages/NotFound";
 import TripResults from "./pages/TripResults";
+import SignIn from "./pages/SignIn";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/trip-results" element={<TripResults />} />
             <Route path="/packing-assistant" element={<PackingAssistant />} />
             <Route path="/chat" element={<ChatGuide />} />
+            <Route path="/sign-in" element={<SignIn />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

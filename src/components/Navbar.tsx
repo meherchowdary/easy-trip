@@ -34,9 +34,11 @@ const Navbar = () => {
             <Link to="/chat" className="text-gray-600 hover:text-travel-primary font-medium">
               Local Guide
             </Link>
-            <Button variant="outline" className="border-travel-primary text-travel-primary hover:bg-travel-light">
-              Sign In
-            </Button>
+            <Link to="/sign-in">
+              <Button variant="outline" className="border-travel-primary text-travel-primary hover:bg-travel-light">
+                Sign In
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -84,9 +86,14 @@ const Navbar = () => {
               >
                 Local Guide
               </Link>
-              <Button variant="outline" className="border-travel-primary text-travel-primary hover:bg-travel-light w-full">
-                Sign In
-              </Button>
+              <Link 
+                to="/sign-in"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Button variant="outline" className="border-travel-primary text-travel-primary hover:bg-travel-light w-full">
+                  Sign In
+                </Button>
+              </Link>
             </div>
           </div>
         )}
